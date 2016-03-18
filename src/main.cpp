@@ -3,22 +3,27 @@
 #include <DMXSerial.h>
 #include <SPI.h>
 
-#define SPI_sck   13
-#define SPI_miso  12
-#define SPI_mosi  11
-#define SPI_ss    10
+// Following defines is for the shift register
 
-#define PLSR_SH_LD_pin  6
+// #define SPI_sck   13
+// #define SPI_miso  12
+// #define SPI_mosi  11
+// #define SPI_ss    10
+//#define PLSR_SH_LD_pin  6
 
 #define smokePin  4
 
 int DMXaddr = 1;
 int recValue = 0;
+// Following definitions are for the 9th bit in address read protocol
 // int MSB = 0;
 // int MSBPin = 7;
+
 int greenPin = 6;
 int bluePin = 9;
 int redPin = 5;
+
+//This function calculates address using the read data from shift register and MSB status
 
 // int getAddress(byte setValue, int MSB) {
 //   int address = (int) setValue;
@@ -32,7 +37,7 @@ void setup() {
   // SPI.begin();                            // start SPI interface which is used for shift register
   // SPI.setDataMode(SPI_MODE0);             // setting mode for shift register
   // SPI.setBitOrder(MSBFIRST);              // says how the data will be ordered, MSB first
-  // SPI.setClockDivider(SPI_CLOCK_DIV2);    // hujzin :D
+  // SPI.setClockDivider(SPI_CLOCK_DIV2);    //
 
   //pinMode(PLSR_SH_LD_pin, OUTPUT);        // set it as output
   //pinMode(smokePin, OUTPUT);              // set up pin 7 as output for smoke maschine
@@ -56,13 +61,22 @@ void loop() {
 
   // Read in all 8 inputs of the SN74HC165 into a byte
   //byte DMX_addr = SPI.transfer(0x00);
+
+  // Read MSB state
   //MSB = digitalRead(MSBPin);
+  // Calculate address
   //DMXaddr = getAddress(DMX_addr, MSB);
+
+  // For testing the address is hard coded
   DMXaddr = 1;
   //recValue = DMXSerial.read(DMXaddr);
+
+  // For testing RGB LED is used with PWM outputs for each color
   analogWrite(redPin, DMXSerial.read(DMXaddr));
   analogWrite(greenPin, DMXSerial.read((DMXaddr+1)));
   analogWrite(bluePin, DMXSerial.read((DMXaddr+2)));
+
+  // If thers is no DMX signal for 5 seconds then light up red LED
   unsigned long lasPacket = DMXSerial.noDataSince();
   // if(recValue > 150) digitalWrite(smokePin, HIGH);
   // else digitalWrite(smokePin, LOW);
