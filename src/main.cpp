@@ -1,5 +1,5 @@
 #include <Arduino.h>
-// #include <DMXSerial.h>           // when using DMX uncomment this
+#include <DMXSerial.h>           // when using DMX uncomment this
 #include <SPI.h>
 
 /**
@@ -21,9 +21,9 @@
 #define SPI_ss    10
 #define PLSR_SH_LD_pin  6
 #define smokePin  4
-#define greenPin  2
-#define bluePin   9
-#define redPin    5
+// #define greenPin  2
+// #define bluePin   9
+// #define redPin    5
 #define MSBPin    7
 #define setPin    8
 
@@ -47,8 +47,8 @@ int previousAddr = 0;
 
 int getAddress(byte setValue, int MSB) {
   int address = (int) setValue;
-  if(MSB == HIGH) address = 256 + address;
-  return address;
+  if(MSB == HIGH) return (256 + address);
+  // return address;
 }
 
 // readColour function reads address from the DMX input
@@ -79,8 +79,8 @@ int getAddress(byte setValue, int MSB) {
 
 
 void setup() {
-  // DMXSerial.init(DMXReceiver);          // initialize DMX as receiver
-  Serial.begin(115200);                   // used for address seting test. Comment out when DMX is being used
+  DMXSerial.init(DMXReceiver);          // initialize DMX as receiver
+  // Serial.begin(115200);                   // used for address seting test. Comment out when DMX is being used
 
   SPI.begin();                            // start SPI interface which is used for shift register
   SPI.setDataMode(SPI_MODE0);             // setting mode for shift register
@@ -89,9 +89,9 @@ void setup() {
 
   pinMode(PLSR_SH_LD_pin, OUTPUT);        // set pins as outputs
   pinMode(smokePin, OUTPUT);              // set up pin 7 as output for smoke maschine
-  pinMode(greenPin, OUTPUT);
-  pinMode(redPin, OUTPUT);
-  pinMode(bluePin, OUTPUT);
+  // pinMode(greenPin, OUTPUT);
+  // pinMode(redPin, OUTPUT);
+  // pinMode(bluePin, OUTPUT);
 
   pinMode(setPin, INPUT);                 // set pins as inputs
   pinMode(MSBPin, INPUT);
@@ -119,13 +119,13 @@ void loop() {
     DMXaddr = getAddress(DMX_addr, MSB);
     // set previous state to read state
     previousAddr = stateAddr;
-    Serial.print("Address ");
-    Serial.print(DMXaddr);
-    Serial.println("is set");
+    // Serial.print("Address ");
+    // Serial.print(DMXaddr);
+    // Serial.println("is set");
   }
 
   // int *colour;
-  // recValue = DMXSerial.read(DMXaddr);
+  recValue = DMXSerial.read(DMXaddr);
 
   // For testing RGB LED is used with PWM outputs for each color
   // int dimmer = DMXSerial.read(DMXaddr);
@@ -139,12 +139,12 @@ void loop() {
 
 
   // If thers is no DMX signal for 5 seconds then light up red LED
-  // unsigned long lasPacket = DMXSerial.noDataSince();
-  // if(recValue > 150) digitalWrite(smokePin, HIGH);
-  // else digitalWrite(smokePin, LOW);
-  // if (lasPacket > 5000) {
-  //   analogWrite(A0, 200*4);
-  // } else analogWrite(A0, 0);
+  unsigned long lasPacket = DMXSerial.noDataSince();
+  if(recValue > 150) digitalWrite(smokePin, HIGH);
+  else digitalWrite(smokePin, LOW);
+  if (lasPacket > 5000) {
+    analogWrite(A0, 200*4);
+  } else analogWrite(A0, 0);
 
   digitalWrite(PLSR_SH_LD_pin, LOW);
 }
