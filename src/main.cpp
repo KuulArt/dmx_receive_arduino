@@ -3,15 +3,15 @@
 #include <SPI.h>
 
 /**
-  Arduino Connections for Shift Register:
+   Arduino Connections for Shift Register:
 
-  Connect [D13] to the Clock pin of the SN74HC165 (pin 2)
-  Connect [D12] to the Qh pin of the SN74HC165 (pin 9)
-  Connect [D11] to nothing.  It's not used in this sketch
-  Connect [D9]  to an LED for testing
-  Connect [D6]  to the SH/LD pin of the SN74HC165 (pin 1)
+   Connect [D13] to the Clock pin of the SN74HC165 (pin 2)
+   Connect [D12] to the Qh pin of the SN74HC165 (pin 9)
+   Connect [D11] to nothing.  It's not used in this sketch
+   Connect [D9]  to an LED for testing
+   Connect [D6]  to the SH/LD pin of the SN74HC165 (pin 1)
 
-  **/
+ **/
 
 // Following defines is pin connections
 
@@ -37,7 +37,7 @@ int MSB = 0;
 // int colourPin[3] = {5, 6, 9};
 
 // Array for storing colours for test RGB LED
-int RGB[3] = {0, 0, 0};
+// int RGB[3] = {0, 0, 0};
 
 // Initialize variables for address is set
 int stateAddr = 0;
@@ -46,9 +46,9 @@ int previousAddr = 0;
 //This function calculates address using the read data from shift register and MSB status
 
 int getAddress(byte setValue, int MSB) {
-  int address = (int) setValue;
-  if(MSB == HIGH) return (256 + address);
-  // return address;
+        int address = (int) setValue;
+        if(MSB == HIGH) return (256 + address);
+        // return address;
 }
 
 // readColour function reads address from the DMX input
@@ -79,72 +79,74 @@ int getAddress(byte setValue, int MSB) {
 
 
 void setup() {
-  DMXSerial.init(DMXReceiver);          // initialize DMX as receiver
-  // Serial.begin(115200);                   // used for address seting test. Comment out when DMX is being used
+        DMXSerial.init(DMXReceiver);    // initialize DMX as receiver
+        // Serial.begin(115200);                   // used for address seting test. Comment out when DMX is being used
 
-  SPI.begin();                            // start SPI interface which is used for shift register
-  SPI.setDataMode(SPI_MODE0);             // setting mode for shift register
-  SPI.setBitOrder(MSBFIRST);              // says how the data will be ordered, MSB first
-  SPI.setClockDivider(SPI_CLOCK_DIV2);    //
+        SPI.begin();                      // start SPI interface which is used for shift register
+        SPI.setDataMode(SPI_MODE0);       // setting mode for shift register
+        SPI.setBitOrder(MSBFIRST);        // says how the data will be ordered, MSB first
+        SPI.setClockDivider(SPI_CLOCK_DIV2); //
 
-  pinMode(PLSR_SH_LD_pin, OUTPUT);        // set pins as outputs
-  pinMode(smokePin, OUTPUT);              // set up pin 7 as output for smoke maschine
-  // pinMode(greenPin, OUTPUT);
-  // pinMode(redPin, OUTPUT);
-  // pinMode(bluePin, OUTPUT);
+        pinMode(PLSR_SH_LD_pin, OUTPUT);  // set pins as outputs
+        pinMode(smokePin, OUTPUT);        // set up pin 7 as output for smoke maschine
+        // pinMode(greenPin, OUTPUT);
+        // pinMode(redPin, OUTPUT);
+        // pinMode(bluePin, OUTPUT);
 
-  pinMode(setPin, INPUT);                 // set pins as inputs
-  pinMode(MSBPin, INPUT);
+        pinMode(setPin, INPUT);           // set pins as inputs
+        pinMode(MSBPin, INPUT);
 
-  // Tell the SN74HC165 Parallel-load shift register to poll the inputs
-  digitalWrite(PLSR_SH_LD_pin, LOW);
-  // put your setup code here, to run once:
+        // Tell the SN74HC165 Parallel-load shift register to poll the inputs
+        digitalWrite(PLSR_SH_LD_pin, LOW);
+        // put your setup code here, to run once:
+        // Serial.println("Initialized!");
 }
 
 void loop() {
-  // Latch the inputs into the shift register
-  digitalWrite(PLSR_SH_LD_pin, HIGH);
+        // Latch the inputs into the shift register
+        digitalWrite(PLSR_SH_LD_pin, HIGH);
 
-  // Read in all 8 inputs of the SN74HC165 into a byte
-  byte DMX_addr = SPI.transfer(0x00);
+        // Read in all 8 inputs of the SN74HC165 into a byte
+        byte DMX_addr = SPI.transfer(0x00);
 
-  // read set state pin
-  stateAddr = digitalRead(setPin);
+        // read set state pin
+        stateAddr = digitalRead(setPin);
+        // Serial.println(stateAddr);
+        //if set state pin has changed from previous time then set address
+        if(stateAddr != previousAddr) {
+                // Read MSB state
+                MSB = digitalRead(MSBPin);
+                // Calculate address
+                DMXaddr = getAddress(DMX_addr, MSB);
+                // set previous state to read state
+                previousAddr = stateAddr;
+                // Serial.print("Address ");
+                // Serial.print(DMXaddr);
+                // Serial.println("is set");
+        }
 
-  //if set state pin has changed from previous time then set address
-  if(stateAddr != previousAddr){
-    // Read MSB state
-    MSB = digitalRead(MSBPin);
-    // Calculate address
-    DMXaddr = getAddress(DMX_addr, MSB);
-    // set previous state to read state
-    previousAddr = stateAddr;
-    // Serial.print("Address ");
-    // Serial.print(DMXaddr);
-    // Serial.println("is set");
-  }
+        // int *colour;
+        recValue = DMXSerial.read(DMXaddr);
+        analogWrite(smokePin, recValue);
 
-  // int *colour;
-  recValue = DMXSerial.read(DMXaddr);
+        // For testing RGB LED is used with PWM outputs for each color
+        // int dimmer = DMXSerial.read(DMXaddr);
+        // colour = readColour((DMXaddr+1));
+        // writeColour(dimmer, colour);
 
-  // For testing RGB LED is used with PWM outputs for each color
-  // int dimmer = DMXSerial.read(DMXaddr);
-  // colour = readColour((DMXaddr+1));
-  // writeColour(dimmer, colour);
-
-  // when not using writeColour function, use these
-  // analogWrite(redPin, DMXSerial.read(DMXaddr));
-  // analogWrite(greenPin, DMXSerial.read((DMXaddr+1)));
-  // analogWrite(bluePin, DMXSerial.read((DMXaddr+2)));
+        // when not using writeColour function, use these
+        // analogWrite(redPin, DMXSerial.read(DMXaddr));
+        // analogWrite(greenPin, DMXSerial.read((DMXaddr+1)));
+        // analogWrite(bluePin, DMXSerial.read((DMXaddr+2)));
 
 
-  // If thers is no DMX signal for 5 seconds then light up red LED
-  unsigned long lasPacket = DMXSerial.noDataSince();
-  if(recValue > 150) digitalWrite(smokePin, HIGH);
-  else digitalWrite(smokePin, LOW);
-  if (lasPacket > 5000) {
-    analogWrite(A0, 200*4);
-  } else analogWrite(A0, 0);
+        // If thers is no DMX signal for 5 seconds then light up red LED
+        unsigned long lasPacket = DMXSerial.noDataSince();
+        if(recValue > 150) digitalWrite(smokePin, HIGH);
+        else digitalWrite(smokePin, LOW);
+        if (lasPacket > 5000) {
+                analogWrite(A0, 200*4);
+        } else analogWrite(A0, 0);
 
-  digitalWrite(PLSR_SH_LD_pin, LOW);
+        digitalWrite(PLSR_SH_LD_pin, LOW);
 }
