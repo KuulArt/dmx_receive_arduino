@@ -48,6 +48,7 @@ int previousAddr = 0;
 int getAddress(byte setValue, int MSB) {
         int address = (int) setValue;
         if(MSB == HIGH) return (256 + address);
+        else return (address);
         // return address;
 }
 
@@ -116,6 +117,8 @@ void loop() {
         if(stateAddr != previousAddr) {
                 // Read MSB state
                 MSB = digitalRead(MSBPin);
+                Serial.print("MSB pin says :");
+                Serial.print(MSB);
                 // Calculate address
                 DMXaddr = getAddress(DMX_addr, MSB);
                 // set previous state to read state
