@@ -48,6 +48,7 @@ int previousAddr = 0;
 int getAddress(byte setValue, int MSB) {
         int address = (int) setValue;
         if(MSB == HIGH) return (256 + address);
+        else return (address);
         // return address;
 }
 
