@@ -128,7 +128,7 @@ void loop() {
 
         // int *colour;
         recValue = DMXSerial.read(DMXaddr);
-        analogWrite(smokePin, recValue);
+        // analogWrite(smokePin, recValue);
 
         // For testing RGB LED is used with PWM outputs for each color
         // int dimmer = DMXSerial.read(DMXaddr);
@@ -146,7 +146,7 @@ void loop() {
         if(recValue > 150) digitalWrite(smokePin, HIGH);
         else digitalWrite(smokePin, LOW);
         if (lasPacket > 5000) {
-                analogWrite(A0, 200*4);
+                analogWrite(A0, 200);
         } else analogWrite(A0, 0);
 
         digitalWrite(PLSR_SH_LD_pin, LOW);
