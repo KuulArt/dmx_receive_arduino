@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <DMXSerial.h>           // when using DMX uncomment this
+// #include <DMXSerial.h>           // when using DMX uncomment this
 #include <SPI.h>
 
 /**
@@ -79,8 +79,8 @@ int getAddress(byte setValue, int MSB) {
 
 
 void setup() {
-        DMXSerial.init(DMXReceiver);    // initialize DMX as receiver
-        // Serial.begin(115200);                   // used for address seting test. Comment out when DMX is being used
+        // DMXSerial.init(DMXReceiver);    // initialize DMX as receiver
+        Serial.begin(115200);                   // used for address seting test. Comment out when DMX is being used
 
         SPI.begin();                      // start SPI interface which is used for shift register
         SPI.setDataMode(SPI_MODE0);       // setting mode for shift register
@@ -120,14 +120,14 @@ void loop() {
                 DMXaddr = getAddress(DMX_addr, MSB);
                 // set previous state to read state
                 previousAddr = stateAddr;
-                // Serial.print("Address ");
-                // Serial.print(DMXaddr);
-                // Serial.println("is set");
+                Serial.print("Address ");
+                Serial.print(DMXaddr);
+                Serial.println("is set");
         }
 
         // int *colour;
-        recValue = DMXSerial.read(DMXaddr);
-        analogWrite(smokePin, recValue);
+        // recValue = DMXSerial.read(DMXaddr);
+        // analogWrite(smokePin, recValue);
 
         // For testing RGB LED is used with PWM outputs for each color
         // int dimmer = DMXSerial.read(DMXaddr);
@@ -141,12 +141,12 @@ void loop() {
 
 
         // If thers is no DMX signal for 5 seconds then light up red LED
-        unsigned long lasPacket = DMXSerial.noDataSince();
-        if(recValue > 150) digitalWrite(smokePin, HIGH);
-        else digitalWrite(smokePin, LOW);
-        if (lasPacket > 5000) {
-                analogWrite(A0, 200*4);
-        } else analogWrite(A0, 0);
+        // unsigned long lasPacket = DMXSerial.noDataSince();
+        // if(recValue > 150) digitalWrite(smokePin, HIGH);
+        // else digitalWrite(smokePin, LOW);
+        // if (lasPacket > 5000) {
+        //         analogWrite(A0, 200*4);
+        // } else analogWrite(A0, 0);
 
         digitalWrite(PLSR_SH_LD_pin, LOW);
 }
